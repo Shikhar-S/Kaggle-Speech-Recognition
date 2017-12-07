@@ -1,2 +1,2 @@
 # Kaggle-Speech-Recognition
-https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/kernels
+https://www.kaggle.com/c/tensorflow-speech-recognition-challenge
