@@ -1,0 +1,10 @@
+Directory Structure
+1.audio := extracted folder from training data 
+2._background_noise_ := extracted from training data
+3.Processed := Contains pickled processed data as a result of gen_mixed.py. To be used as training data in denoising stage.
+ 
+4.gen_mixed.py := Mixes audio from 1 and 2 and pickles after appending original data from 1.
+
+5.filter.py := Code for training network to denoise using RNN.(Not checked)
+
+ 

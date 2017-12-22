@@ -20,11 +20,11 @@ F=open(SAVE_PATH,'w+')
 
 
 
-threshold=0.95
-threshold_add_noise=0.5
-counter=0
-Dictionary=["yes","no", "up", "down", "left", "right", "on", "off", "stop", "go","unknown"]
-NoisePath=["doing_the_dishes.wav","dude_miaowing.wav","exercise_bike.wav","pink_noise.wav","running_tap.wav","white_noise.wav"]
+threshold=0.95 #to equal mix for unknown target type.
+threshold_add_noise=0.5 #half of the files are mixed with noise others copied as is.
+counter=0 
+Dictionary=["yes","no", "up", "down", "left", "right", "on", "off", "stop", "go","unknown"] #targets
+NoisePath=["doing_the_dishes.wav","dude_miaowing.wav","exercise_bike.wav","pink_noise.wav","running_tap.wav","white_noise.wav"] #noise files
 RevDict={}
 for i,x in enumerate(Dictionary):
     RevDict[x]=i
@@ -34,7 +34,7 @@ def getCode(x):
     try:
         return RevDict[x]
     except:
-        return RevDict['unknown']
+        return RevDict['unknown'] #exception for non targets
 
 
 def isTargetDir(x):
@@ -44,16 +44,18 @@ def isTargetDir(x):
         return False
 
 def addNoise(data,dr):
+    #mixes noise in data at sample rate dr 
 	noise_ratio=random.uniform(0.4,0.8)
 	noise_idx=random.randint(0,5)
 	noise,r=librosa.load(os.path.join(NOISE,NoisePath[noise_idx]))
 	cutfrom=random.randint(0,noise.shape[0]-data.shape[0]-1)
-	noise=noise[cutfrom:cutfrom+data.shape[0]]
+	noise=noise[cutfrom:cutfrom+data.shape[0]] #generate an equal length noise clip from the longer recording
 	assert r==dr
 	assert noise.shape[0]==data.shape[0]
 	return noise_ratio*noise+(1-noise_ratio)*data
 
 def getFeatures(data,samplerate):
+    #generates features from data, namely 13 mfcc coefficients and their derivatives
 	mfcc=psf.mfcc(data,samplerate,preemph=0)
 	mfcc_delta=librosa.feature.delta(mfcc,axis=0)
 	data=np.concatenate([mfcc,mfcc_delta],axis=1)
@@ -61,6 +63,7 @@ def getFeatures(data,samplerate):
 	return data
 
 def convert_and_save(file,DIR,directory):
+    #preprocesses an audio file-> 'file' to get features by calling above utility fns
     global counter
     FILE=os.path.join(DIR,file)
     data, samplerate=librosa.load(FILE)
@@ -95,6 +98,6 @@ for directory in os.listdir(PATH):
                 convert_and_save(fl,DIR,directory)    
         print "Done with ", directory
         print "Pickling this Directory"
-        cPickle.dump(toSave,F)
+        cPickle.dump(toSave,F) #pickles directory after directory one after other. Has to be retrieved multiple times when reading. Google pickling multiple files.
         toSave=[]
 

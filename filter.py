@@ -12,6 +12,7 @@ nFolders=30 #modify
 Epochs=10000
 
 def getData(path):
+	#organises data in the format required by neural net
 	global maxtimestep
 	with open(path) as f:
 		data=[]
