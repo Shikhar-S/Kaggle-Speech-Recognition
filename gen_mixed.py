@@ -4,7 +4,7 @@ Created on Fri Nov 17 12:00:46 2017
 
 @author: Shikhar
 """
-import cPickle
+import pickle
 import librosa
 import os
 import random
@@ -16,11 +16,12 @@ import python_speech_features as psf
 PATH="./audio"
 SAVE_PATH='./Processed'
 NOISE="./_background_noise_"
-F=open(SAVE_PATH,'w+')
+F=open(SAVE_PATH,'wb')
 
 
-
-threshold=0.95 #to equal mix for unknown target type.
+TIMESTEP=100 #number of frames per audio (assuming 10 millisecond frame, 1 second audio)
+FEATURES=26 #number of features per frame
+threshold=0.95 #to get equal mix of unknown target type.
 threshold_add_noise=0.5 #half of the files are mixed with noise others copied as is.
 counter=0 
 Dictionary=["yes","no", "up", "down", "left", "right", "on", "off", "stop", "go","unknown"] #targets
@@ -59,8 +60,15 @@ def getFeatures(data,samplerate):
 	mfcc=psf.mfcc(data,samplerate,preemph=0)
 	mfcc_delta=librosa.feature.delta(mfcc,axis=0)
 	data=np.concatenate([mfcc,mfcc_delta],axis=1)
-	data=normalize(data)
-	return data
+	data=normalize(data) #not sure if this is the right thing to do.
+    #TO-DO : make time step equal for all files.
+    if data.shape[0]<TIMESTEP:
+        required=TIMESTEP-data.shap[0]
+        req_array=np.zeros(shape=(required,FEATURES))
+        data=np.concatenate([data,req_array],axis=0)
+    elif data.shape[0]>TIMESTEP:
+        data=data[:TIMESTEP,:]
+	return data #size- time*26
 
 def convert_and_save(file,DIR,directory):
     #preprocesses an audio file-> 'file' to get features by calling above utility fns
@@ -83,7 +91,7 @@ def convert_and_save(file,DIR,directory):
         print counter," -- ",  
         sys.stdout.flush()
 
-
+num_pickels=0
 for directory in os.listdir(PATH):
     DIR=os.path.join(PATH,directory)
     if(os.path.isdir(DIR)):
@@ -98,6 +106,9 @@ for directory in os.listdir(PATH):
                 convert_and_save(fl,DIR,directory)    
         print "Done with ", directory
         print "Pickling this Directory"
-        cPickle.dump(toSave,F) #pickles directory after directory one after other. Has to be retrieved multiple times when reading. Google pickling multiple files.
+        pickle.dump(toSave,F) #pickles directory after directory one after other. Has to be retrieved multiple times when reading. Google pickling multiple files.
+        num_pickels+=1
         toSave=[]
+F.close()
+print(num_pickels, "pickle must be reloaded")
 
