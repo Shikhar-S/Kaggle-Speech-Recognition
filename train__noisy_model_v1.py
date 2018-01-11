@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Jan 11 11:25:52 2018
 
-@author: Shikhar
+@author: t-shbhar
 """
+
 import pickle
 from random import shuffle
 from keras.callbacks import ModelCheckpoint, EarlyStopping
@@ -10,7 +12,7 @@ import numpy as np
 from keras.layers import Input, Dense, LSTM
 from keras.models import Model
 
-SAVED_PATH='./Processed/Processed'
+SAVED_PATH='./Processed'
 num_pickles=30
 data=[]
 target=[]
@@ -21,7 +23,7 @@ TARGET=11
 first_sz=64
 second_sz=64
 third_sz=32
-checkpoint="./Checkpoint_v1"
+checkpoint="./Checkpoint_noisy_v1"
 
 def get_data(i):
     F=open(SAVED_PATH,"rb")
@@ -66,8 +68,8 @@ callbacks=[]
 callbacks.append(ModelCheckpoint(checkpoint,monitor='val_loss',save_best_only=True))
 callbacks.append(EarlyStopping(patience=3))
 model.fit(data,target,batch_size=BATCH_SIZE,epochs=1000,callbacks=callbacks,validation_split=0.2,shuffle=True)
-model.save('audio_classifier_v1.h5')
-model.save('audio_classifier_v1_backup.hd5')
+model.save('audio_classifier_noisy_v1.h5')
+model.save('audio_classifier_noisy_v1_backup.hd5')
 del model
 
 
