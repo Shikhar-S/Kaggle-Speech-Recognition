@@ -10,7 +10,7 @@ import numpy as np
 from keras.layers import Input, Dense, LSTM
 from keras.models import Model
 
-SAVED_PATH='./Processed/Processed'
+SAVED_PATH='./Processed'
 num_pickles=30
 data=[]
 target=[]
@@ -67,7 +67,6 @@ callbacks.append(ModelCheckpoint(checkpoint,monitor='val_loss',save_best_only=Tr
 callbacks.append(EarlyStopping(patience=3))
 model.fit(data,target,batch_size=BATCH_SIZE,epochs=1000,callbacks=callbacks,validation_split=0.2,shuffle=True)
 model.save('audio_classifier_v1.h5')
-model.save('audio_classifier_v1_backup.hd5')
 del model
 
 
